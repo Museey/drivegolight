@@ -753,7 +753,7 @@ window.PROVINCES = PROVINCES;
 /* =====================================================================
    ที่เก็บข้อมูล (บันทึกอัตโนมัติ / มีสำรองในหน่วยความจำ)
    ===================================================================== */
-const APP = { name:'DriveGoLight!', version:'3.5', site:'www.drivebizbegin.com' };
+const APP = { name:'DriveGoLight!', version:'3.6', site:'www.drivebizbegin.com' };
 
 /* =====================================================================
    ระบบทดลองใช้และลิขสิทธิ์รายปี
@@ -1954,7 +1954,11 @@ const uid = ()=> Math.random().toString(36).slice(2,10);
 const esc = s => String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const num = v => { const n=parseFloat(String(v??'').replace(/,/g,'')); return isFinite(n)?n:0; };
 const money = n => (Math.round(num(n)*100)/100).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
-const iso = d => d.toISOString().slice(0,10);
+/* ใช้ค่าปี/เดือน/วันตามเวลาเครื่อง (local) ไม่ใช้ toISOString() เพราะ toISOString()
+   แปลงเป็น UTC ก่อนเสมอ ซึ่งสำหรับเขตเวลาไทย (UTC+7) จะทำให้ได้วันที่ก่อนหน้า 1 วัน
+   ทุกครั้งที่แปลงวันที่แบบ local-midnight กลับเป็นสตริง (พบบั๊กนี้ตอนตรวจสอบระบบ
+   ออกรหัสลิขสิทธิ์ — ทำให้วันหมดอายุที่ถอดได้คลาดเคลื่อนไป 1 วันเสมอ) */
+const iso = d => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
 const today = ()=> iso(new Date());
 const TH_MONTHS = ["มกราคม","กุมภาพันธ์","มีนาคม","เมษายน","พฤษภาคม","มิถุนายน",
                    "กรกฎาคม","สิงหาคม","กันยายน","ตุลาคม","พฤศจิกายน","ธันวาคม"];
@@ -5928,7 +5932,7 @@ function renderSettings(){
         ${APP.name} รุ่น ${APP.version} · ดาวน์โหลดโปรแกรมรุ่นล่าสุดได้ที่ ${APP.site}<br>
         สถานะการบันทึกข้อมูล: <b>${STORAGE_STATUS_TEXT[STORAGE_MODE] || STORAGE_STATUS_TEXT.memory}</b><br>
         ขนาดข้อมูลปัจจุบันโดยประมาณ: <b>${estimateDataSizeMB().toFixed(estimateDataSizeMB()<0.01?4:2)} MB</b><br>
-        สำรองข้อมูล (export) ครั้งล่าสุด: <b>${DB.lastExportAt ? (thDate(DB.lastExportAt.slice(0,10)) + ' ' + new Date(DB.lastExportAt).toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit'})) : 'ยังไม่เคยสำรองข้อมูล'}</b>
+        สำรองข้อมูล (export) ครั้งล่าสุด: <b>${DB.lastExportAt ? (thDate(iso(new Date(DB.lastExportAt))) + ' ' + new Date(DB.lastExportAt).toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit'})) : 'ยังไม่เคยสำรองข้อมูล'}</b>
       </div>
     </div></div>
 
