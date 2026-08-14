@@ -392,6 +392,8 @@ button.tag.linkcode:hover{background:var(--steel);border-color:var(--steel);colo
 .chip.warn{background:#FCF3E2;color:var(--warn);border-color:#EEDBB4}
 .chip.dead{background:#F3EADF;color:var(--flag-dead-ink);border-color:#DCC7AB}
 .chip.max{background:#FBE9E7;color:var(--flag-max-ink);border-color:#F0CBC7}
+button.chip{cursor:pointer}
+button.chip.ok:hover{background:#1D7A5F;border-color:#1D7A5F;color:#fff}
 
 .stat{display:flex;gap:0;border:1px solid var(--line);border-radius:8px;overflow:hidden;background:#fff;box-shadow:var(--shadow)}
 .stat div{flex:1;padding:12px 16px;border-right:1px solid var(--line-2)}
@@ -3111,10 +3113,11 @@ function customerModal(id, presetKind){
         เข้าซ่อมล่าสุด ${h.last? thDate(h.last):'—'}</div>
       ${h.quotes.length? `<div class="tablewrap" style="max-height:150px;border:1px solid var(--line);border-radius:6px">
         <table class="tbl"><thead><tr><th>เลขที่</th><th>วันที่</th><th>ทะเบียน</th><th class="num">ยอดรวม</th><th>สถานะ</th></tr></thead><tbody>
-        ${h.quotes.slice().reverse().map(q=>`<tr><td class="mono">${esc(q.no)}</td><td>${thDate(q.date)}</td>
+        ${h.quotes.slice().reverse().map(q=>{ const rc = q.status==='billed' ? rcOfQuote(q) : null; return `<tr><td class="mono">${esc(q.no)}</td><td>${thDate(q.date)}</td>
           <td class="mono">${esc([q.veh.plateA,q.veh.plateB].filter(Boolean).join(' ')||'-')}</td>
           <td class="num mono">${money(totalsOf(q).grand)}</td>
-          <td>${q.status==='billed'?'<span class="chip ok">ออกใบเสร็จแล้ว</span>':'<span class="chip warn">ค้างวางบิล</span>'}</td></tr>`).join('')}
+          <td>${rc? `<button class="chip ok" data-gohistrc="${rc.id}" title="เปิดดูใบเสร็จรับเงิน ${esc(rc.no)}">ออกใบเสร็จแล้ว</button>`
+            : q.status==='billed'?'<span class="chip ok">ออกใบเสร็จแล้ว</span>':'<span class="chip warn">ค้างวางบิล</span>'}</td></tr>`; }).join('')}
         </tbody></table></div>` : ''}` : ''}
   `;
 
@@ -3190,9 +3193,21 @@ function customerModal(id, presetKind){
 
   customerModalRebind(c, body, renderVeh, readAll);
   renderVeh();
+  bindHistoryLinks();
+}
+/* กดที่สถานะ "ออกใบเสร็จแล้ว" ในประวัติการเข้าซ่อม เพื่อเปิดดูใบเสร็จฉบับนั้นโดยตรง */
+function bindHistoryLinks(){
+  $$('[data-gohistrc]').forEach(b=>b.onclick=()=>{
+    const rc = DB.receipts.find(x=>x.id===b.dataset.gohistrc); if(!rc) return;
+    closeModal();
+    curRec = JSON.parse(JSON.stringify(rc));
+    docView = 'paper';
+    go('receipt');
+    window.scrollTo({top:0});
+  });
 }
 function customerModalRebind(c, body, renderVeh, readAll){
-  const redraw = ()=>{ readAll(); $('#mBody').innerHTML = body(); renderVeh(); customerModalRebind(c, body, renderVeh, readAll); };
+  const redraw = ()=>{ readAll(); $('#mBody').innerHTML = body(); renderVeh(); bindHistoryLinks(); customerModalRebind(c, body, renderVeh, readAll); };
   $('#c_type').onchange = redraw;
   $('#c_kind').onchange = ()=>{
     /* ผู้ขายมักเป็นนิติบุคคล — ตั้งค่าให้ล่วงหน้าเมื่อยังไม่ได้กรอกชื่อ */
