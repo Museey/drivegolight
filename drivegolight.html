@@ -1056,17 +1056,6 @@ async function loadDB(){
   if(!DB.customers) DB.customers = [];
   if(!('lastExportAt' in DB)) DB.lastExportAt = null;
 
-  /* ชุดข้อมูลทดสอบรุ่นใหม่ — สร้างทับให้อัตโนมัติหนึ่งครั้ง
-     เว้นแต่ผู้ใช้เคยกดเริ่มบันทึกข้อมูลจริงไว้แล้ว
-     ข้อมูลก่อนทับถูกสำรองไว้ กู้คืนได้ที่เมนูตั้งค่าร้าน */
-  if(!DB.demoDismissed && DB.demoVersion !== DEMO_VERSION){
-    if(d && (DB.products.length || DB.customers.length || DB.quotes.length ||
-             DB.receipts.length || DB.purchases.length)){
-      try{ localStorage.setItem(BACKUP_KEY, JSON.stringify({savedAt:today(), db:d})); }catch(e){}
-      DB.demoReplaced = true;
-    }
-    seedDemo();
-  }
   licInit();
   if(!DB.users) DB.users = [];
   DB.users.forEach(migrateUserPerms);
