@@ -61,9 +61,9 @@ a{color:inherit}
 
 /* ---------- ส่วนหัว ---------- */
 .hero{background:var(--night);color:#fff;position:relative;overflow:hidden;padding:74px 0 88px}
-.hero::before{content:"";position:absolute;width:820px;height:820px;border-radius:50%;
+.hero::before{content:"";position:absolute;width:820px;height:820px;border-radius:50%;pointer-events:none;
   background:radial-gradient(circle,rgba(255,239,91,.16),transparent 62%);top:-330px;right:-230px}
-.hero::after{content:"";position:absolute;width:560px;height:560px;border-radius:50%;
+.hero::after{content:"";position:absolute;width:560px;height:560px;border-radius:50%;pointer-events:none;
   background:radial-gradient(circle,rgba(55,181,84,.17),transparent 62%);bottom:-300px;left:-190px}
 .hero .wrap{position:relative;display:grid;grid-template-columns:1.15fr .85fr;gap:52px;align-items:center}
 .hero h1{font-size:44px;line-height:1.24;margin:16px 0 16px;letter-spacing:-.6px;font-weight:700}
@@ -149,7 +149,7 @@ table.demo-t tr:last-child td{border-bottom:0}
 .plan li::before{content:"✓";position:absolute;left:0;top:-1px;color:var(--green);font-weight:700;font-size:17px}
 .plan .btn{margin-top:auto;width:100%}
 .plan.hero-plan{background:var(--night);border-color:var(--night);color:#fff;position:relative;overflow:hidden}
-.plan.hero-plan::after{content:"";position:absolute;width:420px;height:420px;border-radius:50%;
+.plan.hero-plan::after{content:"";position:absolute;width:420px;height:420px;border-radius:50%;pointer-events:none;
   background:radial-gradient(circle,rgba(255,239,91,.14),transparent 65%);top:-190px;right:-150px}
 .plan.hero-plan .tier{color:var(--yellow);position:relative}
 .plan.hero-plan .price{color:#fff;position:relative}
